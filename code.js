@@ -1,33 +1,31 @@
 "use strict";
-// This plugin will open a window to prompt the user to enter a number, and
-// it will then create that many rectangles on the screen.
+// This plugin will count and display the number of pages in the Figma file
 // This file holds the main code for plugins. Code in this file has access to
 // the *figma document* via the figma global object.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
 // This shows the HTML page in "ui.html".
-figma.showUI(__html__);
-// Calls to "parent.postMessage" from within the HTML page will trigger this
-// callback. The callback will be passed the "pluginMessage" property of the
-// posted message.
+figma.showUI(__html__, { width: 300, height: 200 });
+try {
+    // Get the number of pages and send it to the UI
+    const pageCount = figma.root.children.length;
+    console.log('Number of pages:', pageCount);
+    // Send the count to the UI
+    figma.ui.postMessage({
+        type: 'page-count',
+        count: pageCount
+    });
+}
+catch (error) {
+    console.error('Error counting pages:', error);
+    figma.ui.postMessage({
+        type: 'error',
+        message: 'Failed to count pages: ' + ((error === null || error === void 0 ? void 0 : error.message) || 'Unknown error')
+    });
+}
+// Handle messages from the UI
 figma.ui.onmessage = (msg) => {
-    // One way of distinguishing between different types of messages sent from
-    // your HTML page is to use an object with a "type" property like this.
-    if (msg.type === 'create-shapes') {
-        // This plugin creates rectangles on the screen.
-        const numberOfRectangles = msg.count;
-        const nodes = [];
-        for (let i = 0; i < numberOfRectangles; i++) {
-            const rect = figma.createRectangle();
-            rect.x = i * 150;
-            rect.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }];
-            figma.currentPage.appendChild(rect);
-            nodes.push(rect);
-        }
-        figma.currentPage.selection = nodes;
-        figma.viewport.scrollAndZoomIntoView(nodes);
+    if (msg.type === 'cancel') {
+        figma.closePlugin();
     }
-    // Make sure to close the plugin when you're done. Otherwise the plugin will
-    // keep running, which shows the cancel button at the bottom of the screen.
-    figma.closePlugin();
 };
