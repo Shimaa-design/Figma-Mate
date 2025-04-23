@@ -5,19 +5,24 @@
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
 
+console.log('Plugin starting...');
+
 // This shows the HTML page in "ui.html".
 figma.showUI(__html__, { width: 300, height: 200 });
+console.log('UI shown');
 
 try {
   // Get the number of pages and send it to the UI
   const pageCount = figma.root.children.length;
   console.log('Number of pages:', pageCount);
+  console.log('Root children:', figma.root.children);
   
   // Send the count to the UI
   figma.ui.postMessage({ 
     type: 'page-count', 
     count: pageCount 
   });
+  console.log('Message sent to UI');
 } catch (error: any) {
   console.error('Error counting pages:', error);
   figma.ui.postMessage({ 
@@ -28,7 +33,9 @@ try {
 
 // Handle messages from the UI
 figma.ui.onmessage = (msg: { type: string }) => {
+  console.log('Received message from UI:', msg);
   if (msg.type === 'cancel') {
+    console.log('Closing plugin');
     figma.closePlugin();
   }
 };
