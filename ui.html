@@ -1,20 +1,19 @@
-<h2>Page Counter</h2>
-<p id="page-count">Loading page count...</p>
+<h2>Create Index Page</h2>
+<p id="status-message">Creating Index page...</p>
 <p id="error-message" style="color: red; display: none;"></p>
 <button id="close">Close</button>
 <script>
   // Listen for messages from the plugin code
   window.onmessage = (event) => {
     const message = event.data.pluginMessage;
-    const pageCountElement = document.getElementById('page-count');
+    const statusElement = document.getElementById('status-message');
     const errorElement = document.getElementById('error-message');
     
-    if (message.type === 'page-count') {
-      pageCountElement.textContent = 
-        `This file has ${message.count} page${message.count !== 1 ? 's' : ''}`;
+    if (message.type === 'success') {
+      statusElement.textContent = message.message;
       errorElement.style.display = 'none';
     } else if (message.type === 'error') {
-      pageCountElement.textContent = 'Failed to count pages';
+      statusElement.textContent = 'Failed to create Index page';
       errorElement.textContent = message.message;
       errorElement.style.display = 'block';
     }
